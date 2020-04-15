@@ -1,0 +1,31 @@
+# Binary storage
+JintUtils/bin/
+JintUtils/obj/
+JintUtils/lib/
+# Binary storage
+Prueba-jint/bin/
+Prueba-jint/obj/
+Prueba-jint/lib/
+# Binary files
+*.db
+*.dll
+*.exe
+
+# NuGet packages
+*.nupkg
+**/packages/*
+!**/packages/build/
+#!**/packages/repositories.config
+
+# IDE clutter
+.vs/
+*.suo
+*.user
+*.userprefs
+
+# Profiling sessions
+*.vspx
+*.psess
+
+# Miscellaneous
+*.cache
