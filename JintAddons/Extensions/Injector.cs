@@ -12,7 +12,7 @@ namespace JintAddons.Extensions
         {
             var interval = new Interval();
             engine.SetValue("console", new Console());
-
+            engine.SetValue("JSON", new JSON());
             engine.SetValue("parseInt", new Func<string, int>((string val) =>
             {
                 return Int32.Parse(val);
@@ -28,6 +28,7 @@ namespace JintAddons.Extensions
 
             engine.SetValue("setInterval", new Func<Func<object>, int, Timer>(interval.setInterval));
             engine.SetValue("cleanInterval", new Func<Timer, bool>(interval.cleanInterval));
+
         }
     }
 }

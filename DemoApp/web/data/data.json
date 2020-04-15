@@ -1,0 +1,16 @@
+﻿{
+  "title":"Mi template",
+  "mi": "mama",
+  "me": "dijo",
+  "cfrToken": "token",
+  "bindO": "{{",
+  "bindC": "}}",
+  "bucle": [
+       "toto",
+       "belto",
+       "garcia",
+       "rodrigo",
+       "mateo"
+  ]
+
+}

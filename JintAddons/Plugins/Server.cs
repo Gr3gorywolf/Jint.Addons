@@ -5,7 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
+using Nustache.Core;
 namespace JintAddons.Plugins
 {
     public class Server
@@ -17,8 +17,9 @@ namespace JintAddons.Plugins
         private Dictionary<string, Action<Request, Response>> PATCHS = new Dictionary<string, Action<Request, Response>>();
         private Dictionary<string, Action<Request, Response>> DELETES = new Dictionary<string, Action<Request, Response>>();
         public string PublicFolder = "";
-        public  HttpListener listener;
+        public HttpListener listener;
         public bool enabled = false;
+        public bool UseClientSideRouting = false;
         Thread handleThread;
 
         public void start(int port)
@@ -45,10 +46,8 @@ namespace JintAddons.Plugins
             while (enabled)
             {
                 HttpListenerContext ctx = await listener.GetContextAsync();
-                var response = new Response(ctx);
-                var request = new Request(ctx);
                 Dictionary<string, Action<Request, Response>> routesDictionary = null;
-                
+
                 switch (ctx.Request.HttpMethod)
                 {
                     case "GET":
@@ -67,27 +66,41 @@ namespace JintAddons.Plugins
                         routesDictionary = DELETES;
                         break;
                 }
+
+                handleIndexRedirection(ctx);
                 if (!IsFromPublicFolder(ctx))
                 {
                     bool found = false;
                     foreach (var route in routesDictionary.Keys)
                     {
-                        if (ctx.Request.RawUrl == route || route.EndsWith("*"))
+                        if (ctx.Request.RawUrl == route)
                         {
                             found = true;
+                            var response = new Response(ctx);
+                            var request = new Request(ctx);
                             routesDictionary[route].Invoke(request, response);
                         }
                     }
                     if (!found)
                     {
-                        handle404Async(ctx);
+
+                        if (!UseClientSideRouting)
+                        {
+                            handle404Async(ctx);
+                        }
+                        else
+                        {
+
+                            new Response(ctx).file(PublicFolder + "/index.html");
+                        }
+
                     }
                 }
                 else
                 {
                     handlePublicResponse(ctx);
                 }
-             
+
             }
 
 
@@ -103,26 +116,20 @@ namespace JintAddons.Plugins
         {
             string filename = PublicFolder + ctx.Request.RawUrl;
             filename = WebUtility.UrlDecode(filename);
-            string mime;
-            ctx.Response.StatusCode = (int)HttpStatusCode.OK;
+            new Response(ctx).file(filename);
 
-            using (var stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
-            {
-                ctx.Response.ContentType = Utils.Server.mimeTypesMap.TryGetValue(Path.GetExtension(filename), out mime) ? mime : "undefined";
-                ctx.Response.ContentLength64 = stream.Length;
-                ctx.Response.AddHeader("Accept-Ranges", "bytes");
-                ctx.Response.AddHeader("Date", DateTime.Now.ToString("r"));
-                ctx.Response.AddHeader("Last-Modified", System.IO.File.GetLastWriteTime(filename).ToString("r"));
-                ctx.Response.AddHeader("Content-Range", string.Format("bytes {0}-{1}/{2}", 0, Convert.ToInt32(stream.Length) - 1, Convert.ToInt32(stream.Length)));
-                ctx.Response.ContentLength64 = stream.Length;
-                stream.CopyTo(ctx.Response.OutputStream);
-                stream.Flush();
-            }
-            ctx.Response.OutputStream.Flush();
-            ctx.Response.OutputStream.Close();
-            ctx.Response.Close();
+
         }
-
+        private void handleIndexRedirection(HttpListenerContext ctx)
+        {
+            if (ctx.Request.RawUrl == "/" && this.PublicFolder == "")
+            {
+                if (!this.GETS.ContainsKey("/"))
+                {
+                    new Response(ctx).file(this.PublicFolder + "/index.html");
+                }
+            }
+        }
 
         private async Task handle404Async(HttpListenerContext ctx)
         {
@@ -133,39 +140,121 @@ namespace JintAddons.Plugins
         public class Response
         {
             HttpListenerContext context { get; set; }
-            public Response (HttpListenerContext ctx)
+            public Response(HttpListenerContext ctx)
             {
                 context = ctx;
             }
+
+
+            public async void file(string filePath)
+            {
+                if (!File.Exists(filePath))
+                {
+                    send(NoFoundTemplate(filePath), 404, "text/html");
+                    return;
+                }
+                try
+                {
+                    HttpListenerResponse response = context.Response;
+                    response.KeepAlive = true;
+                    response.SendChunked = true;
+                    context.Response.StatusCode = (int)HttpStatusCode.OK;
+                    string mime;
+                    var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    response.ContentType = Utils.Server.mimeTypesMap.TryGetValue(Path.GetExtension(filePath), out mime) ? mime : "undefined";
+                    response.ContentLength64 = stream.Length;
+                    response.AddHeader("Accept-Ranges", "bytes");
+                    response.AddHeader("Date", DateTime.Now.ToString("r"));
+                    response.AddHeader("Last-Modified", System.IO.File.GetLastWriteTime(filePath).ToString("r"));
+                    response.AddHeader("Content-Range", string.Format("bytes {0}-{1}/{2}", 0, Convert.ToInt32(stream.Length) - 1, Convert.ToInt32(stream.Length)));
+                    response.ContentLength64 = stream.Length;
+                    stream.CopyTo(context.Response.OutputStream);
+                    stream.Flush();
+                    response.Close();
+                }
+                catch (Exception ex) {
+                    if (JintAddons.debug)
+                    {
+                        Console.WriteLine(ex.Message + " " + ex.StackTrace);
+                    }
+                }
+
+
+            }
+
+
+            public async void view(string viewPath, object data)
+            {
+                try
+                {
+                    var html = Render.FileToString(viewPath, data);
+                    send(html, 200, "text/html");
+                }
+                catch (Exception ex)
+                {
+                    if (JintAddons.debug)
+                    {
+                        Console.WriteLine(ex.Message + " " + ex.StackTrace);
+                    }
+                    send(Server.OopsTemplate(ex.Message, ex.StackTrace), 500, "text/html");
+                }
+
+
+            }
             public async void send(string data, int statusCode, string contentType)
             {
-                var response = context.Response;
-                byte[] bytes = Encoding.UTF8.GetBytes(data);
-                response.ContentType = contentType;
-                response.ContentEncoding = Encoding.UTF8;
-                response.ContentLength64 = bytes.LongLength;
-                response.StatusCode = statusCode;
-                await response.OutputStream.WriteAsync(bytes, 0, bytes.Length);
-                response.Close();
+                try
+                {
+                    var response = context.Response;
+                    byte[] bytes = Encoding.UTF8.GetBytes(data);
+                    response.ContentType = contentType;
+                    response.ContentEncoding = Encoding.UTF8;
+                    response.ContentLength64 = bytes.LongLength;
+                    response.StatusCode = statusCode;
+                    await response.OutputStream.WriteAsync(bytes, 0, bytes.Length);
+                    response.Close();
+                }
+                catch (Exception ex)
+                {
+
+                    if (JintAddons.debug)
+                    {
+                        Console.WriteLine(ex.Message + " " + ex.StackTrace);
+                    }
+                    send(Server.OopsTemplate(ex.Message, ex.StackTrace), 500, "text/html");
+                }
+
             }
 
             public async void redirect(string route)
             {
-                context.Response.Redirect(route);
+                try
+                {
+                    context.Response.Redirect(route);
+                }
+                catch (Exception ex)
+                {
+                    if (JintAddons.debug)
+                    {
+                        Console.WriteLine(ex.Message + " " +  ex.StackTrace);
+                    }
+                    send(Server.OopsTemplate(ex.Message, ex.StackTrace), 500, "text/html");
+                }
             }
         }
 
         public class Request
         {
             HttpListenerContext context { get; set; }
-            public  string data { get; set; }
-           public Request(HttpListenerContext ctx)
+            public string data { get; set; }
+            public Request(HttpListenerContext ctx)
             {
+                context = ctx;
                 var request = ctx.Request;
                 StreamReader stream = new StreamReader(request.InputStream);
-                this.data =  stream.ReadToEnd();
+                this.data = stream.ReadToEnd();
             }
-            
+
         }
 
 
@@ -176,8 +265,14 @@ namespace JintAddons.Plugins
             return this;
         }
 
+        public Server clientSideRouting(bool value)
+        {
+            this.UseClientSideRouting = value;
+            return this;
+        }
 
-        public Server get(string route , Action<Request, Response> callback)
+
+        public Server get(string route, Action<Request, Response> callback)
         {
 
             GETS.Add(route, callback);
@@ -212,9 +307,29 @@ namespace JintAddons.Plugins
 
 
 
-        public string NoFoundTemplate(string route )
+
+        public static string OopsTemplate(string error, string trace)
         {
-           var _res = $@"
+
+            if (!JintAddons.debug)
+            {
+                error = "an error has occurred";
+                trace = "";
+            }
+
+            var _res = $@"
+
+              <h1>Oooops</h1><br>
+             <h3>{error}</h3>
+             <h6 style='color:red'>{trace}</h6>
+                  
+             ";
+            return _res;
+        }
+
+        public static string NoFoundTemplate(string route)
+        {
+            var _res = $@"
                <!DOCTYPE html>
                <html lang='en'>
                <head>

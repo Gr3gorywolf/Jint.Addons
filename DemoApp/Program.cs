@@ -11,10 +11,20 @@ namespace DemoApp
     {
         static void Main(string[] args)
         {
+            const string scriptsFolder = "";
+
             var engine = new Engine(cfg => cfg.AllowClr());
-            JintAddons.JintAddons.Inject(engine);
-            engine.Execute(File.ReadAllText("../../../scripts/server.js"));
+
+            //Addons injection 
+            JintAddons.JintAddons.Inject(engine,true);
+            engine.Execute(ReadScript("server"));
             
+        }
+
+
+        public static string ReadScript(string scriptName)
+        {
+           return File.ReadAllText($"../../../scripts/{scriptName}.js");
         }
     }
 }
