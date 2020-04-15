@@ -1,11 +1,11 @@
 # Binary storage
-JintUtils/bin/
-JintUtils/obj/
-JintUtils/lib/
+JintAddons/bin/
+JintAddons/obj/
+JintAddons/lib/
 # Binary storage
-Prueba-jint/bin/
-Prueba-jint/obj/
-Prueba-jint/lib/
+DemoApp/bin/
+DemoApp/obj/
+DemoApp/lib/
 # Binary files
 *.db
 *.dll
