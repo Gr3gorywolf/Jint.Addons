@@ -13,7 +13,7 @@ namespace DemoApp
         {
             var engine = new Engine(cfg => cfg.AllowClr());
             JintAddons.JintAddons.Inject(engine);
-            engine.Execute(File.ReadAllText("scripts/server.js"));
+            engine.Execute(File.ReadAllText("../../../scripts/server.js"));
             
         }
     }
