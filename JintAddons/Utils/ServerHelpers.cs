@@ -95,14 +95,14 @@ namespace JintAddons.Utils
             {
                  result = reader.ReadToEnd();
             }
-            string template = "<h5 style='color:red'>Template rendering failed</h5>";
+            string template = "";
             try
             {
                  template = Render.StringToString(result, data);
             }
             catch (Exception)
             {
-                template = null;
+                template = "<h5 style='color:red'>Template rendering failed</h5>";
             }
             return template;
         }

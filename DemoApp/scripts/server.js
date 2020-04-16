@@ -1,4 +1,8 @@
 let srv = new Server();
+srv.appendResponseHeader("Access-Control-Allow-Origin","*");
+srv.appendResponseHeader("Access-Control-Allow-Credentials","true");
+srv.appendResponseHeader("Access-Control-Allow-Methods","*");
+srv.appendResponseHeader("Access-Control-Allow-Headers","*");
 let basePath = "../../../web/";
 let names = [
 "james",
@@ -21,7 +25,7 @@ srv.post('/api/v1/submit', function(req,res){
 })
 
 srv.get('/mustache/index', function(req,res){
-   res.view(basePath + 'templates/hello.mustache', JSON.parse(File.read(basePath +  "data/data.json")));
+   res.render(basePath + 'templates/home.mustache', {klk:"awawawawaw"});
 });
 
 srv.get('/mustache/500', function(req,res){
@@ -32,12 +36,6 @@ srv.get('/mustache/dd', function(req,res){
    res.dd(users);
 })
 
-
-
-srv.clientSideRouting(true);
-srv.staticFolder('public');
-srv.staticFolder('4444444');
-//srv.staticFolder('music');
 srv.start(3000);
 console.log('servidor iniciado en el puerto 3000');
 console.read();

@@ -10,7 +10,7 @@ using NLog.Fluent;
 using Nustache.Core;
 namespace JintAddons.Plugins
 {
-    public class Server
+    public partial class Server
     {
 
         private Dictionary<string, Action<Request, Response>> GETS = new Dictionary<string, Action<Request, Response>>();
@@ -19,6 +19,7 @@ namespace JintAddons.Plugins
         private Dictionary<string, Action<Request, Response>> PATCHS = new Dictionary<string, Action<Request, Response>>();
         private Dictionary<string, Action<Request, Response>> DELETES = new Dictionary<string, Action<Request, Response>>();
         public List<string> PublicFolders = new List<string>();
+        public Dictionary<string,string> ResponseHeaders = new Dictionary<string,string>();
         public HttpListener listener;
         public bool enabled = false;
         public bool UseClientSideRouting = false;
@@ -59,6 +60,12 @@ namespace JintAddons.Plugins
             {
                 HttpListenerContext ctx = await listener.GetContextAsync();
                 Dictionary<string, Action<Request, Response>> routesDictionary = null;
+
+                foreach(var resHeader in ResponseHeaders)
+                {
+                    ctx.Response.Headers.Add(resHeader.Key, resHeader.Value);
+                }
+               
 
                 switch (ctx.Request.HttpMethod)
                 {
@@ -163,9 +170,12 @@ namespace JintAddons.Plugins
         public class Response
         {
             HttpListenerContext context { get; set; }
+
+            
             public Response(HttpListenerContext ctx)
             {
                 context = ctx;
+
             }
 
 
@@ -211,7 +221,7 @@ namespace JintAddons.Plugins
             }
 
 
-            public async void view(string viewPath, object data)
+            public async void render(string viewPath, object data)
             {
                 try
                 {
@@ -303,6 +313,11 @@ namespace JintAddons.Plugins
         }
 
 
+        public Server appendResponseHeader(string key,string value)
+        {
+            this.ResponseHeaders.Add(key, value);
+            return this;
+        }
 
         public Server staticFolder(string path)
         {
