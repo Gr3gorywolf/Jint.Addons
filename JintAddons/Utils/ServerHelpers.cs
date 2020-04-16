@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
+using System.Linq;
+using Nustache.Core;
+using System.IO;
+using System.Text.RegularExpressions;
 
 namespace JintAddons.Utils
 {
@@ -15,7 +20,7 @@ namespace JintAddons.Utils
         {".bin", "application/octet-stream"},
         {".cco", "application/x-cocoa"},
         {".crt", "application/x-x509-ca-cert"},
-        {".css", "text/css"},
+        {".css", "text/css"}, 
         {".deb", "application/octet-stream"},
         {".der", "application/x-x509-ca-cert"},
         {".dll", "application/octet-stream"},
@@ -39,6 +44,7 @@ namespace JintAddons.Utils
         {".jpeg", "image/jpeg"},
         {".jpg", "image/jpeg"},
         {".js", "application/x-javascript"},
+        {".json", "application/json"},
         {".mml", "text/mathml"},
         {".mng", "video/x-mng"},
         {".mov", "video/quicktime"},
@@ -76,5 +82,55 @@ namespace JintAddons.Utils
         {".mp4", "video/mpeg"},
             #endregion
         };
+
+
+        public static string getTemplate(string templateFullName,object data)
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            string resourceName =assembly.GetManifestResourceNames()
+                                    .Single(str => str.EndsWith(templateFullName));
+            string result = "";
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                 result = reader.ReadToEnd();
+            }
+            string template = "<h5 style='color:red'>Template rendering failed</h5>";
+            try
+            {
+                 template = Render.StringToString(result, data);
+            }
+            catch (Exception)
+            {
+                template = null;
+            }
+            return template;
+        }
+
+        public static string RemoveIllegalPathCharacters(string path)
+        {
+            string regexSearch = new string(System.IO.Path.GetInvalidFileNameChars()) + new string(System.IO.Path.GetInvalidPathChars());
+            var r = new Regex(string.Format("[{0}]", Regex.Escape(regexSearch)));
+            return r.Replace(path, "");
+        }
+
+        public static string GetFileFromFolders(List<string> folders, string fileName)
+        {
+            var file = "";
+            fileName = System.Web.HttpUtility.UrlDecode(fileName);
+            foreach (var fold in folders)
+            {
+                    foreach (var fls in Directory.GetFiles(fold, "*.*", SearchOption.AllDirectories))
+                    {
+                        var normalizedPath = fls.Replace(@"\", "/");
+                        if (normalizedPath.EndsWith(fileName))
+                        {
+                            file = fls;
+                            break;
+                        }
+                    }
+            }
+            return file;
+        }
     }
 }

@@ -5,6 +5,8 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using NLog.Fluent;
 using Nustache.Core;
 namespace JintAddons.Plugins
 {
@@ -16,7 +18,7 @@ namespace JintAddons.Plugins
         private Dictionary<string, Action<Request, Response>> PUTS = new Dictionary<string, Action<Request, Response>>();
         private Dictionary<string, Action<Request, Response>> PATCHS = new Dictionary<string, Action<Request, Response>>();
         private Dictionary<string, Action<Request, Response>> DELETES = new Dictionary<string, Action<Request, Response>>();
-        public string PublicFolder = "";
+        public List<string> PublicFolders = new List<string>();
         public HttpListener listener;
         public bool enabled = false;
         public bool UseClientSideRouting = false;
@@ -35,14 +37,24 @@ namespace JintAddons.Plugins
 
         public void stop()
         {
-            listener.Stop();
+
             this.enabled = false;
-            handleThread.Abort();
+            listener.Close();
+            try
+            {
+                handleThread.Abort();
+            }
+            catch (Exception)
+            {
+
+            }
         }
 
 
-        public async void HandleRequest()
+        private async void HandleRequest()
         {
+
+          //  try {
             while (enabled)
             {
                 HttpListenerContext ctx = await listener.GetContextAsync();
@@ -91,7 +103,7 @@ namespace JintAddons.Plugins
                         else
                         {
 
-                            new Response(ctx).file(PublicFolder + "/index.html");
+                            new Response(ctx).file(Utils.Server.GetFileFromFolders(PublicFolders, "index.html"));
                         }
 
                     }
@@ -102,19 +114,27 @@ namespace JintAddons.Plugins
                 }
 
             }
+          /*  }
+            catch (Exception ex)
+            {
+                if (JintAddons.debug)
+                {
+                   Log.Error(ex.Message + " " + ex.StackTrace);
+                }
+            }*/
 
 
         }
 
         private bool IsFromPublicFolder(HttpListenerContext context)
         {
-            string filename = PublicFolder + WebUtility.UrlDecode(context.Request.RawUrl);
+            string filename = Utils.Server.GetFileFromFolders(PublicFolders, context.Request.RawUrl);
             return File.Exists(filename);
         }
 
         private void handlePublicResponse(HttpListenerContext ctx)
         {
-            string filename = PublicFolder + ctx.Request.RawUrl;
+            string filename = Utils.Server.GetFileFromFolders(PublicFolders,ctx.Request.RawUrl);
             filename = WebUtility.UrlDecode(filename);
             new Response(ctx).file(filename);
 
@@ -122,11 +142,11 @@ namespace JintAddons.Plugins
         }
         private void handleIndexRedirection(HttpListenerContext ctx)
         {
-            if (ctx.Request.RawUrl == "/" && this.PublicFolder == "")
+            if (ctx.Request.RawUrl == "/" && this.PublicFolders.Count ==0)
             {
                 if (!this.GETS.ContainsKey("/"))
                 {
-                    new Response(ctx).file(this.PublicFolder + "/index.html");
+                    new Response(ctx).file("index.html");
                 }
             }
         }
@@ -137,6 +157,9 @@ namespace JintAddons.Plugins
         }
 
 
+         
+
+
         public class Response
         {
             HttpListenerContext context { get; set; }
@@ -145,6 +168,11 @@ namespace JintAddons.Plugins
                 context = ctx;
             }
 
+
+            public async void dd(object data)
+            {
+                send(DDTemplate(data), 200, "text/html");
+            }
 
             public async void file(string filePath)
             {
@@ -175,7 +203,7 @@ namespace JintAddons.Plugins
                 catch (Exception ex) {
                     if (JintAddons.debug)
                     {
-                        Console.WriteLine(ex.Message + " " + ex.StackTrace);
+                        Log.Error(ex.Message + " " + ex.StackTrace);
                     }
                 }
 
@@ -194,9 +222,9 @@ namespace JintAddons.Plugins
                 {
                     if (JintAddons.debug)
                     {
-                        Console.WriteLine(ex.Message + " " + ex.StackTrace);
+                        Log.Error(ex.Message + " " + ex.StackTrace);
                     }
-                    send(Server.OopsTemplate(ex.Message, ex.StackTrace), 500, "text/html");
+                    send(Server.OopsTemplate(ex), 500, "text/html");
                 }
 
 
@@ -219,11 +247,16 @@ namespace JintAddons.Plugins
 
                     if (JintAddons.debug)
                     {
-                        Console.WriteLine(ex.Message + " " + ex.StackTrace);
+                        Log.Error(ex.Message + " " + ex.StackTrace);
                     }
-                    send(Server.OopsTemplate(ex.Message, ex.StackTrace), 500, "text/html");
+                    send(Server.OopsTemplate(ex), 500, "text/html");
                 }
 
+            }
+
+            public async void send(object data, int statusCode)
+            {
+                   send(JsonConvert.SerializeObject(data), statusCode, "application/json");
             }
 
             public async void redirect(string route)
@@ -236,9 +269,9 @@ namespace JintAddons.Plugins
                 {
                     if (JintAddons.debug)
                     {
-                        Console.WriteLine(ex.Message + " " +  ex.StackTrace);
+                        Log.Error(ex.Message + " " + ex.StackTrace);
                     }
-                    send(Server.OopsTemplate(ex.Message, ex.StackTrace), 500, "text/html");
+                    send(Server.OopsTemplate(ex), 500, "text/html");
                 }
             }
         }
@@ -259,9 +292,19 @@ namespace JintAddons.Plugins
 
 
 
-        public Server staticFiles(string path)
+        public Server staticFolder(string path)
         {
-            this.PublicFolder = path;
+            if (Directory.Exists(path))
+            {
+                this.PublicFolders.Add(path);
+            }
+            else
+            {
+                if (JintAddons.debug)
+                {
+                    Log.Error("Folder doesnt exist");
+                }
+            }
             return this;
         }
 
@@ -308,42 +351,36 @@ namespace JintAddons.Plugins
 
 
 
-        public static string OopsTemplate(string error, string trace)
+
+
+        public static string DDTemplate(object json)
         {
-
-            if (!JintAddons.debug)
+            if (JintAddons.debug)
             {
-                error = "an error has occurred";
-                trace = "";
+                json = new
+                {
+                    error="Wrong mode",
+                    message="Debug mode must be off"
+                };
             }
+            return Utils.Server.getTemplate("DD.mustache", JsonConvert.SerializeObject(json));
+        }
 
-            var _res = $@"
 
-              <h1>Oooops</h1><br>
-             <h3>{error}</h3>
-             <h6 style='color:red'>{trace}</h6>
-                  
-             ";
-            return _res;
+        public static string OopsTemplate(Exception ex)
+        {
+            string error = null;
+            if (JintAddons.debug)
+            {
+                error = ex.Message+" --> "+ex.StackTrace;
+            }
+            return Utils.Server.getTemplate("OopsTemplate.mustache", new { error });
         }
 
         public static string NoFoundTemplate(string route)
         {
-            var _res = $@"
-               <!DOCTYPE html>
-               <html lang='en'>
-               <head>
-               <meta charset='UTF-8'>
-               <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-                <title>No found</title>
-                </head>
-                 <body>
-                  <h1>{route} No found</h1>
-
-                </body>
-             </html>
-            ";
-            return _res;
+             
+            return Utils.Server.getTemplate("404.mustache",new {route});
         }
 
 

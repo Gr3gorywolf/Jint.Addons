@@ -1,16 +1,16 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }}</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" 
-    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
 </head>
 <body>
     {{ mi }}
-    <a href="/mustache/home">sss</a>
+    <a href="/mustache/index">sss</a>
     <h5>la real lista</h5>
     <ol>
         {{ #bucle }}
@@ -33,14 +33,14 @@
 var data = "{{ me }}"
 window.token = "{{cfrToken}}";
 window.data = [
-    
+
      {{ #bucle }}
        "{{.}}",
         {{ /bucle }}
-    
+
     ]
 new Vue({
-     
+
     el:"#mango",
      delimiters: ["<(",")>"],
     data:{
@@ -51,7 +51,7 @@ new Vue({
     },
     methods:{
       prro(){
-       this.number++; 
+       this.number++;
     }
     }
 })
