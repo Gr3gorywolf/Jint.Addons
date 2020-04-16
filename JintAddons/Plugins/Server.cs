@@ -279,14 +279,26 @@ namespace JintAddons.Plugins
         public class Request
         {
             HttpListenerContext context { get; set; }
-            public string data { get; set; }
+            public object data { get; set; }
             public Request(HttpListenerContext ctx)
             {
                 context = ctx;
                 var request = ctx.Request;
                 StreamReader stream = new StreamReader(request.InputStream);
-                this.data = stream.ReadToEnd();
+                var input = stream.ReadToEnd();
+                try
+                {
+                    data = JsonConvert.DeserializeObject(input);
+                }
+                catch (Exception)
+                {
+                    data = input;
+                }
+
+                
+
             }
+            
 
         }
 
@@ -355,12 +367,12 @@ namespace JintAddons.Plugins
 
         public static string DDTemplate(object json)
         {
-            if (JintAddons.debug)
+            if (!JintAddons.debug)
             {
                 json = new
                 {
                     error="Wrong mode",
-                    message="Debug mode must be off"
+                    message="Debug mode must be on"
                 };
             }
             return Utils.Server.getTemplate("DD.mustache", JsonConvert.SerializeObject(json));
