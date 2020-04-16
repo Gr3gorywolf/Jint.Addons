@@ -10,14 +10,18 @@
 </head>
  
 <body style="background-color: #333333">
+
+
     <div id="content">
+
         <div class="notfounsd">
-            <h5>{{ route }} no found</h5>
             <div class="number number01">4</div>
             <div class="number number02">0</div>
             <div class="number number03">4</div>
-        </div>
+        </div><br>
+        <h5 class="text-center" style="color:white">{{ route }} no found</h5>
     </div>
+   
 </body>
 </html>
 
@@ -45,7 +49,8 @@
     }
 
         #content .notfounsd {
-            height: 100%;
+            margin-top: calc(50% - 200px);
+            height: 200px;
             color: #ffffff;
             display: flex;
             justify-content: center;

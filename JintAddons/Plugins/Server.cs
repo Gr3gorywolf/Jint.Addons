@@ -54,7 +54,7 @@ namespace JintAddons.Plugins
         private async void HandleRequest()
         {
 
-          //  try {
+          
             while (enabled)
             {
                 HttpListenerContext ctx = await listener.GetContextAsync();
@@ -78,8 +78,9 @@ namespace JintAddons.Plugins
                         routesDictionary = DELETES;
                         break;
                 }
-
-                handleIndexRedirection(ctx);
+                try
+                {
+                    handleIndexRedirection(ctx);
                 if (!IsFromPublicFolder(ctx))
                 {
                     bool found = false;
@@ -113,17 +114,16 @@ namespace JintAddons.Plugins
                     handlePublicResponse(ctx);
                 }
 
+            
             }
-          /*  }
-            catch (Exception ex)
-            {
-                if (JintAddons.debug)
+                catch (Exception ex)
                 {
-                   Log.Error(ex.Message + " " + ex.StackTrace);
+                    if (JintAddons.debug)
+                    {
+                        Log.Error(ex.Message + " " + ex.StackTrace);
+                    }
                 }
-            }*/
-
-
+            }
         }
 
         private bool IsFromPublicFolder(HttpListenerContext context)
@@ -142,11 +142,11 @@ namespace JintAddons.Plugins
         }
         private void handleIndexRedirection(HttpListenerContext ctx)
         {
-            if (ctx.Request.RawUrl == "/" && this.PublicFolders.Count ==0)
+            if (ctx.Request.RawUrl == "/" && this.GETS.Count>0)
             {
                 if (!this.GETS.ContainsKey("/"))
                 {
-                    new Response(ctx).file("index.html");
+                    new Response(ctx).redirect("/index.html");
                 }
             }
         }

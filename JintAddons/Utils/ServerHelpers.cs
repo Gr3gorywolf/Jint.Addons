@@ -116,11 +116,22 @@ namespace JintAddons.Utils
 
         public static string GetFileFromFolders(List<string> folders, string fileName)
         {
-            var file = "";
             fileName = System.Web.HttpUtility.UrlDecode(fileName);
+            if (fileName.StartsWith("/"))
+            {
+               fileName =  fileName.Remove(0, 1);
+            }
+            var file = "";
             foreach (var fold in folders)
             {
-                    foreach (var fls in Directory.GetFiles(fold, "*.*", SearchOption.AllDirectories))
+                var filePath = Path.Combine(Path.GetFullPath(fold), fileName);
+                if (File.Exists(filePath))
+                {
+                    return filePath;
+                }
+
+
+                 /*   foreach (var fls in Directory.GetFiles(fold, "*.*", SearchOption.AllDirectories))
                     {
                         var normalizedPath = fls.Replace(@"\", "/");
                         if (normalizedPath.EndsWith(fileName))
@@ -128,7 +139,7 @@ namespace JintAddons.Utils
                             file = fls;
                             break;
                         }
-                    }
+                    }*/
             }
             return file;
         }

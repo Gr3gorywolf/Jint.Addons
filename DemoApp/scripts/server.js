@@ -34,8 +34,9 @@ srv.get('/mustache/dd', function(req,res){
 
 
 
-//srv.clientSideRouting(true);
+srv.clientSideRouting(true);
 srv.staticFolder('public');
+srv.staticFolder('4444444');
 //srv.staticFolder('music');
 srv.start(3000);
 console.log('servidor iniciado en el puerto 3000');
