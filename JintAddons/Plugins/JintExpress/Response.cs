@@ -82,6 +82,17 @@ namespace JintAddons.Plugins.JintExpress
 
 
         }
+
+
+        public async void send(string data)
+        {
+            send(data,200,"text/plain");
+        }
+        public async void send(string data, int statusCode)
+        {
+            send(data, statusCode, "text/plain");
+        }
+
         public async void send(string data, int statusCode, string contentType)
         {
             try
@@ -107,6 +118,11 @@ namespace JintAddons.Plugins.JintExpress
 
         }
 
+
+        public async void json(object data)
+        {
+            json(data, 200);
+        }
         public async void json(object data, int statusCode)
         {
             send(JsonConvert.SerializeObject(data), statusCode, "application/json");

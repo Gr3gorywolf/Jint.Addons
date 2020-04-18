@@ -40,11 +40,23 @@ namespace JintAddons.Plugins.JintExpress
         }
         #endregion
 
-         public void listen (int port, string host )
+
+
+
+        public void listen(int port, Action callback, string host)
         {
             this.hostname = host;
             listen(port);
+            callback.Invoke();
         }
+
+        public void listen(int port, Action callback)
+        {
+         
+            listen(port);
+            callback.Invoke();
+        }
+       
         public void listen (int port )
         {
             this.port = port;
