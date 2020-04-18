@@ -10,9 +10,7 @@ let names = [
 "ocean",
 "modalis"
 ]
-
 let users = []
-
 srv.get('/api/v1/index', function (req, res) {
     res.send('Yo soy la pampara prendidisimaaaa', 200, '')
 });
@@ -36,7 +34,7 @@ srv.get('/mustache/dd', function(req,res){
    res.dd(users);
 })
 
-srv.start(3000);
-console.log('servidor iniciado en el puerto 3000');
+srv.start(3000,srv.localIp);
+console.log('servidor iniciado en '+ srv.localIp+':'+ srv.port);
 console.read();
 srv.stop();

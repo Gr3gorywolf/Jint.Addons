@@ -7,15 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Utils\ServerTemplates\404.mustache" />
-    <None Remove="Utils\ServerTemplates\DD.mustache" />
-    <None Remove="Utils\ServerTemplates\OopsTemplate.mustache" />
+    <None Remove="Plugins\JintExpress\ServerTemplates\404.mustache" />
+    <None Remove="Plugins\JintExpress\ServerTemplates\DD.mustache" />
+    <None Remove="Plugins\JintExpress\ServerTemplates\OopsTemplate.mustache" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Utils\ServerTemplates\DD.mustache" />
-    <EmbeddedResource Include="Utils\ServerTemplates\OopsTemplate.mustache" />
-    <EmbeddedResource Include="Utils\ServerTemplates\404.mustache" />
+    <EmbeddedResource Include="Plugins\JintExpress\ServerTemplates\DD.mustache" />
+    <EmbeddedResource Include="Plugins\JintExpress\ServerTemplates\OopsTemplate.mustache" />
+    <EmbeddedResource Include="Plugins\JintExpress\ServerTemplates\404.mustache" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,6 +23,10 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="NLog" Version="4.7.0" />
     <PackageReference Include="Nustache" Version="1.16.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Utils\" />
   </ItemGroup>
 
 </Project>

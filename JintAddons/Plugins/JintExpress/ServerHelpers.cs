@@ -6,10 +6,11 @@ using System.Linq;
 using Nustache.Core;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Net;
 
-namespace JintAddons.Utils
+namespace JintAddons.Plugins.JintExpress
 {
-    public class Server
+    public class ServerHelpers
     {
 
         public static IDictionary<string, string> mimeTypesMap = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) {
@@ -107,6 +108,22 @@ namespace JintAddons.Utils
             return template;
         }
 
+
+        public static string GetLocalIp()
+        {
+            string ipAddress = "";
+            IPAddress[] localIPs = Dns.GetHostAddresses(Dns.GetHostName());
+            foreach (IPAddress ip in localIPs)
+            {
+                if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                {
+                    ipAddress = ip.ToString();
+
+                }
+            }
+            return ipAddress;
+        }
+
         public static string RemoveIllegalPathCharacters(string path)
         {
             string regexSearch = new string(System.IO.Path.GetInvalidFileNameChars()) + new string(System.IO.Path.GetInvalidPathChars());
@@ -129,17 +146,6 @@ namespace JintAddons.Utils
                 {
                     return filePath;
                 }
-
-
-                 /*   foreach (var fls in Directory.GetFiles(fold, "*.*", SearchOption.AllDirectories))
-                    {
-                        var normalizedPath = fls.Replace(@"\", "/");
-                        if (normalizedPath.EndsWith(fileName))
-                        {
-                            file = fls;
-                            break;
-                        }
-                    }*/
             }
             return file;
         }

@@ -10,7 +10,7 @@ namespace JintAddons.Plugins
         {
             engine.SetValue("File", typeof(FileSystem));
             engine.SetValue("fetch", typeof(Fetch));
-            engine.SetValue("Server", typeof(Server));
+            engine.SetValue("Server", typeof(JintExpress.Server));
         }
     }
 }
