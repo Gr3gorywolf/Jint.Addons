@@ -21,8 +21,15 @@
  */
 
 /* Background for the tree. May use for <body> element */
+
+body{
+    background-color:black;
+}
 .jsontree_bg {
-    background: #FFF;
+    background: black;
+}
+b{
+    color: white;
 }
 
 /* Styles for the container of the tree (e.g. fonts, margins etc.) */
@@ -51,7 +58,7 @@
 .jsontree_label {
     font-weight: normal;
     vertical-align: top;
-    color: #000;
+    color: white;
     position: relative;
     padding: 1px;
     border-radius: 4px;
@@ -82,7 +89,7 @@
     font-weight: bold;
 }
 .jsontree_value_number {
-    color: #000E59;
+    color: #004359;
     font-weight: bold;
 }
 .jsontree_value_boolean {
@@ -105,6 +112,7 @@
 }
 .jsontree_show-more {
     cursor: pointer;
+    color:white;
 }
 .jsontree_node_expanded > .jsontree_value-wrapper > .jsontree_value > .jsontree_show-more {
     display: none;
