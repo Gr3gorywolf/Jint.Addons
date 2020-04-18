@@ -107,7 +107,7 @@ namespace JintAddons.Plugins.JintExpress
 
         }
 
-        public async void send(object data, int statusCode)
+        public async void json(object data, int statusCode)
         {
             send(JsonConvert.SerializeObject(data), statusCode, "application/json");
         }
