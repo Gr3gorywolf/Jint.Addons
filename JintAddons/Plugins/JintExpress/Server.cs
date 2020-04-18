@@ -40,12 +40,12 @@ namespace JintAddons.Plugins.JintExpress
         }
         #endregion
 
-         public void start (int port, string host )
+         public void listen (int port, string host )
         {
             this.hostname = host;
-            start(port);
+            listen(port);
         }
-        public void start(int port )
+        public void listen (int port )
         {
             this.port = port;
             if(hostname == null)

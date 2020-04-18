@@ -35,7 +35,7 @@ srv.get('/mustache/dd', function (req, res) {
 });
 srv.allowClientSideRouting(true);
 srv.staticFolder('public')
-srv.start(3000);
+srv.listen(3000);
 console.log('servidor iniciado en ' + srv.hostname + ':' + srv.port);
 console.read();
 srv.stop();

@@ -19,7 +19,10 @@
     </ol>
 
     <div id="mango">
+
         <button class="btn btn-lg" @click="prro"> <(number)></button>
+
+        
     </div>
 
 
@@ -36,18 +39,16 @@ window.data = [
     
      {{ #bucle }}
        "{{.}}",
-        {{ /bucle }}
+    {{ /bucle }}
     
     ]
 new Vue({
-     
     el:"#mango",
-     delimiters: ["<(",")>"],
+    delimiters: ["<(",")>"],
     data:{
         token:window.token,
         number:0,
-       data:window.data
-
+        data:window.data
     },
     methods:{
       prro(){
