@@ -40,18 +40,13 @@ namespace DemoApp
             }
             Console.Clear();
             Console.WriteLine("Loading " + selectedScript + " press F5 to return to menu anytime");
+            var engine = new Engine(cfg => { });
+            JintAddons.JintAddons.Inject(engine, true);
             engineThread = new Thread(new ThreadStart(() =>
             {
-                var engine = new Engine(cfg => {
-
-                    
-
-                });
-                JintAddons.JintAddons.Inject(engine, true);
                 engine.Execute(ReadScript(selectedScript));
             }));
             engineThread.Start();
-            
             while (true)
             {
               var pressedKey =  Console.ReadKey();
@@ -76,6 +71,7 @@ namespace DemoApp
 
        
 
+      
 
         public static string ReadScript(string scriptName)
         {

@@ -18,7 +18,6 @@ srv.get('/api/v1/index', function (req, res) {
 });
 srv.post('/api/v1/form', function (req, res) {
    users.push(req.data);
-   console.log(req.data);
    res.render(basePath + 'templates/form.mustache', { klk: "awawawawaw" });
 });
 

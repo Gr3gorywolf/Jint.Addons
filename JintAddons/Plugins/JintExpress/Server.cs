@@ -25,7 +25,8 @@ namespace JintAddons.Plugins.JintExpress
         private HttpListener listener;
         private bool enabled = false;
         private bool UseClientSideRouting = false;
-        private Thread handleThread;
+        private IAsyncResult handle;
+
         #endregion
 
         #region Server Public fields
@@ -69,103 +70,110 @@ namespace JintAddons.Plugins.JintExpress
             listener = new HttpListener();
             listener.Prefixes.Add(url);
             listener.Start();
-            handleThread = new Thread(new ThreadStart(HandleIncomingRequest));
-            handleThread.Start();
+            handle = listener.BeginGetContext(new AsyncCallback(HandleIncomingRequest), listener);
+
+
         }
 
         public void stop()
         {
-
+          
+            handle.AsyncWaitHandle.WaitOne(1000);
+            this.listener.Abort();
             this.enabled = false;
-            listener.Close();
+        }
+
+        private async void HandleIncomingRequest(IAsyncResult res)
+        {
+
+
+            HttpListenerContext ctx = null;
             try
             {
-                handleThread.Abort();
+                ctx = listener.EndGetContext(res);
             }
             catch (Exception)
             {
-
+                return;
             }
-        }
 
-        private async void HandleIncomingRequest()
-        {
 
-            while (enabled)
+            Dictionary<string, Action<Request, Response>> routesDictionary = null;
+
+            foreach (var resHeader in ResponseHeaders)
             {
-                HttpListenerContext ctx = await listener.GetContextAsync();
-                Dictionary<string, Action<Request, Response>> routesDictionary = null;
+                ctx.Response.Headers.Add(resHeader.Key, resHeader.Value);
+            }
 
-                foreach (var resHeader in ResponseHeaders)
+            switch (ctx.Request.HttpMethod)
+            {
+                case "GET":
+                    routesDictionary = GETS;
+                    break;
+                case "POST":
+                    routesDictionary = POSTS;
+                    break;
+                case "PUT":
+                    routesDictionary = PUTS;
+                    break;
+                case "PATCH":
+                    routesDictionary = PATCHS;
+                    break;
+                case "DELETE":
+                    routesDictionary = DELETES;
+                    break;
+            }
+            try
+            {
+                handleIndexRedirection(ctx);
+                if (!IsFromPublicFolder(ctx))
                 {
-                    ctx.Response.Headers.Add(resHeader.Key, resHeader.Value);
-                }
-
-                switch (ctx.Request.HttpMethod)
-                {
-                    case "GET":
-                        routesDictionary = GETS;
-                        break;
-                    case "POST":
-                        routesDictionary = POSTS;
-                        break;
-                    case "PUT":
-                        routesDictionary = PUTS;
-                        break;
-                    case "PATCH":
-                        routesDictionary = PATCHS;
-                        break;
-                    case "DELETE":
-                        routesDictionary = DELETES;
-                        break;
-                }
-                try
-                {
-                    handleIndexRedirection(ctx);
-                    if (!IsFromPublicFolder(ctx))
+                    bool found = false;
+                    foreach (var route in routesDictionary.Keys)
                     {
-                        bool found = false;
-                        foreach (var route in routesDictionary.Keys)
+
+                        if (ServerHelpers.NormalizeRoute(ctx.Request.RawUrl) == route)
                         {
-
-                            if (ServerHelpers.NormalizeRoute(ctx.Request.RawUrl) ==  route) 
-                            {
-                                found = true;
-                                var response = new Response(ctx);
-                                var request = new Request(ctx);
-                                routesDictionary[route].Invoke(request, response);
-                            }
-                        }
-                        if (!found)
-                        {
-
-                            if (!UseClientSideRouting)
-                            {
-                                handle404(ctx);
-                            }
-                            else
-                            {
-
-                                new Response(ctx).file(ServerHelpers.GetFileFromFolders(PublicFolders, "index.html"));
-                            }
-
+                            found = true;
+                            var response = new Response(ctx);
+                            var request = new Request(ctx);
+                            routesDictionary[route].Invoke(request, response);
                         }
                     }
-                    else
+                    if (!found)
                     {
-                        handlePublicResponse(ctx);
+
+                        if (!UseClientSideRouting)
+                        {
+                            handle404(ctx);
+                        }
+                        else
+                        {
+
+                            new Response(ctx).file(ServerHelpers.GetFileFromFolders(PublicFolders, "index.html"));
+                        }
+
                     }
-
-
                 }
-                catch (Exception ex)
+                else
                 {
-                    if (JintAddons.debug)
-                    {
-                        Log.Error(ex.Message + " " + ex.StackTrace);
-                    }
+                    handlePublicResponse(ctx);
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                if (JintAddons.debug)
+                {
+                    Log.Error(ex.Message + " " + ex.StackTrace);
                 }
             }
+            if (enabled)
+            {
+                handle = listener.BeginGetContext(new AsyncCallback(HandleIncomingRequest), listener);
+            }
+
         }
 
         private bool IsFromPublicFolder(HttpListenerContext ctx)
