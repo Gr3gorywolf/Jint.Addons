@@ -69,7 +69,7 @@ namespace JintAddons.Plugins.JintExpress
             listener = new HttpListener();
             listener.Prefixes.Add(url);
             listener.Start();
-            handleThread = new Thread(new ThreadStart(HandleRequest));
+            handleThread = new Thread(new ThreadStart(HandleIncomingRequest));
             handleThread.Start();
         }
 
@@ -88,7 +88,7 @@ namespace JintAddons.Plugins.JintExpress
             }
         }
 
-        private async void HandleRequest()
+        private async void HandleIncomingRequest()
         {
 
             while (enabled)
@@ -127,7 +127,8 @@ namespace JintAddons.Plugins.JintExpress
                         bool found = false;
                         foreach (var route in routesDictionary.Keys)
                         {
-                            if (ctx.Request.RawUrl == route)
+
+                            if (ServerHelpers.NormalizeRoute(ctx.Request.RawUrl) ==  route) 
                             {
                                 found = true;
                                 var response = new Response(ctx);
@@ -167,19 +168,17 @@ namespace JintAddons.Plugins.JintExpress
             }
         }
 
-        private bool IsFromPublicFolder(HttpListenerContext context)
+        private bool IsFromPublicFolder(HttpListenerContext ctx)
         {
-            string filename = ServerHelpers.GetFileFromFolders(PublicFolders, context.Request.RawUrl);
+            string filename = ServerHelpers.GetFileFromFolders(PublicFolders, ServerHelpers.NormalizeRoute(ctx.Request.RawUrl));
             return File.Exists(filename);
         }
 
         private void handlePublicResponse(HttpListenerContext ctx)
         {
-            string filename = ServerHelpers.GetFileFromFolders(PublicFolders, ctx.Request.RawUrl);
+            string filename = ServerHelpers.GetFileFromFolders(PublicFolders, ServerHelpers.NormalizeRoute(ctx.Request.RawUrl));
             filename = WebUtility.UrlDecode(filename);
             new Response(ctx).file(filename);
-
-
         }
         private void handleIndexRedirection(HttpListenerContext ctx)
         {
@@ -228,33 +227,34 @@ namespace JintAddons.Plugins.JintExpress
         public Server get(string route, Action<Request, Response> callback)
         {
 
-            GETS.Add(route, callback);
+            GETS.Add(ServerHelpers.NormalizeRoute(route), callback);
             return this;
         }
 
         public Server post(string route, Action<Request, Response> callback)
         {
 
-            POSTS.Add(route, callback);
+            POSTS.Add(ServerHelpers.NormalizeRoute(route), callback);
             return this;
         }
         public Server put(string route, Action<Request, Response> callback)
         {
 
-            PUTS.Add(route, callback);
+            PUTS.Add(ServerHelpers.NormalizeRoute(route), callback);
             return this;
         }
         public Server patch(string route, Action<Request, Response> callback)
         {
 
-            PATCHS.Add(route, callback);
+            PATCHS.Add(ServerHelpers.NormalizeRoute(route), callback);
             return this;
         }
         public Server delete(string route, Action<Request, Response> callback)
         {
 
-            DELETES.Add(route, callback);
+            DELETES.Add(ServerHelpers.NormalizeRoute(route), callback);
             return this;
         }
+
     }
 }

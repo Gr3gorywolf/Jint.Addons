@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -9,19 +9,14 @@
 
 </head>
 <body>
-    {{ mi }}
-    <a href="/mustache/index">sss</a>
-    <h5>la real lista</h5>
-    <ol>
-        {{ #bucle }}
-        <li>{{.}}</li>
-        {{ /bucle }}
-    </ol>
-
-    <div id="mango">
-        <button class="btn btn-lg" @click="prro"> <(number)></button>
-    </div>
-
+     
+    <form method="POST"  action="/api/v1/form">
+        <input type="hidden" name="data" value="modifiedd">
+        <input type="hidden" name="data2" value="modifiedd2">
+        <input type="hidden" name="data3" value="modifiedd3">
+        <input type="hidden" name="data4" value="modifiedd4">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
 
 </body>
 </html>

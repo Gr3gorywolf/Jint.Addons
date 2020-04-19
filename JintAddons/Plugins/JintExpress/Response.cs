@@ -132,6 +132,7 @@ namespace JintAddons.Plugins.JintExpress
         {
             try
             {
+                context.Response.RedirectLocation = route;
                 context.Response.Redirect(route);
             }
             catch (Exception ex)

@@ -12,18 +12,22 @@ let names = [
 ]
 let users = []
 srv.get('/api/v1/index', function (req, res) {
-   res.send('Yo soy la pampara prendidisimaaaa', 200, '')
+   console.log(req.query.hola);
+   console.log(req.query.mundo);
+   res.redirect('/mustache/form');
 });
-srv.post('/api/v1/submit', function (req, res) {
+srv.post('/api/v1/form', function (req, res) {
    users.push(req.data);
-   res.send({
-      status: "posted",
-      message: "ok"
-   }, 200);
+   console.log(req.data);
+   res.render(basePath + 'templates/form.mustache', { klk: "awawawawaw" });
+});
+
+srv.get('/mustache/form', function (req, res) {
+   res.render(basePath + 'templates/form.mustache', { klk: "awawawawaw" });
 });
 
 srv.get('/mustache/index', function (req, res) {
-   res.render(basePath + 'templates/home.mustache', { klk: "awawawawaw" });
+   res.render(basePath + 'templates/hello.mustache', { klk: "awawawawaw" });
 });
 
 srv.get('/mustache/500', function (req, res) {

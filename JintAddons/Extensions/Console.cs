@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Text;
 
 namespace JintAddons.Extensions
@@ -12,7 +14,9 @@ namespace JintAddons.Extensions
             {
                 return (object content) =>
                 {
-                    System.Console.WriteLine(content);
+                  
+                        System.Console.WriteLine(JsonConvert.SerializeObject(content));
+                   
                 };
             }
         }

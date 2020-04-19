@@ -85,7 +85,23 @@ namespace JintAddons.Plugins.JintExpress
         };
 
 
-        public static string getTemplate(string templateFullName,object data)
+        
+      
+        /// <summary>
+        /// Removes the query strings and self complete the specified route 
+        /// </summary>
+        /// <returns></returns>
+        public static string NormalizeRoute(string route)
+        {
+            route =  (route.StartsWith("/") ? route : $"/{route}");
+            if (route.Contains("?"))
+            {
+                return route.Split('?')[0];
+            }
+            return route;
+        }
+
+        public static string GetTemplate(string templateFullName,object data)
         {
             var assembly = Assembly.GetExecutingAssembly();
             string resourceName =assembly.GetManifestResourceNames()
@@ -106,6 +122,26 @@ namespace JintAddons.Plugins.JintExpress
                 template = "<h5 style='color:red'>Template rendering failed</h5>";
             }
             return template;
+        }
+
+
+        public static object ParseFormData(string formData)
+        {
+
+            Dictionary<string, object> form = new Dictionary<string, object>();
+            if (formData.Contains("&"))
+            {
+                foreach (var pair in formData.Split('&'))
+                {
+                    if (pair.Contains('='))
+                    {
+                        var pairData = pair.Split('=');
+                        form.Add(pairData[0], pairData[1]);
+                    }
+
+                }
+            }
+            return Utils.ObjectUtils.DictionaryToObject(form);
         }
 
 
