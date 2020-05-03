@@ -14,8 +14,15 @@ namespace JintAddons.Extensions
             {
                 return (object content) =>
                 {
-                  
+                    if(content.GetType() == typeof(string))
+                    {
+                        System.Console.WriteLine(content);
+                    }
+                    else
+                    {
                         System.Console.WriteLine(JsonConvert.SerializeObject(content));
+                    }
+                      
                    
                 };
             }

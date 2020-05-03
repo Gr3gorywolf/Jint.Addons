@@ -1,11 +1,13 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Text;
 
 namespace JintAddons.Utils
 {
-   public class ObjectUtils
+   public static class ObjectUtils
     {
 
         public static dynamic DictionaryToObject(IDictionary<String, Object> dictionary)
@@ -20,7 +22,7 @@ namespace JintAddons.Utils
             dynamic eoDynamic = expandoObj;
             return eoDynamic;
         }
-
+       
 
     }
 }
