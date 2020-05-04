@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading;
 
 namespace JintAddons.Plugins.JintExpress
 {
@@ -36,22 +37,24 @@ namespace JintAddons.Plugins.JintExpress
             }
             try
             {
-                HttpListenerResponse response = context.Response;
-                response.KeepAlive = true;
-                response.SendChunked = true;
-                context.Response.StatusCode = (int)HttpStatusCode.OK;
-                string mime;
-                var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                response.ContentType = ServerHelpers.mimeTypesMap.TryGetValue(Path.GetExtension(filePath), out mime) ? mime : "undefined";
-                response.ContentLength64 = stream.Length;
-                response.AddHeader("Accept-Ranges", "bytes");
-                response.AddHeader("Date", DateTime.Now.ToString("r"));
-                response.AddHeader("Last-Modified", System.IO.File.GetLastWriteTime(filePath).ToString("r"));
-                response.AddHeader("Content-Range", string.Format("bytes {0}-{1}/{2}", 0, Convert.ToInt32(stream.Length) - 1, Convert.ToInt32(stream.Length)));
-                response.ContentLength64 = stream.Length;
-                stream.CopyTo(context.Response.OutputStream);
-                stream.Flush();
-                response.Close();
+               
+                    HttpListenerResponse response = context.Response;
+                    response.KeepAlive = true;
+                    response.SendChunked = true;
+                    context.Response.StatusCode = (int)HttpStatusCode.OK;
+                    string mime;
+                    var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    response.ContentType = ServerHelpers.mimeTypesMap.TryGetValue(Path.GetExtension(filePath), out mime) ? mime : "undefined";
+                    response.ContentLength64 = stream.Length;
+                    response.AddHeader("Accept-Ranges", "bytes");
+                    response.AddHeader("Date", DateTime.Now.ToString("r"));
+                    response.AddHeader("Last-Modified", System.IO.File.GetLastWriteTime(filePath).ToString("r"));
+                    response.AddHeader("Content-Range", string.Format("bytes {0}-{1}/{2}", 0, Convert.ToInt32(stream.Length) - 1, Convert.ToInt32(stream.Length)));
+                    response.ContentLength64 = stream.Length;
+              
+                    await stream.CopyToAsync(context.Response.OutputStream);
+                    await stream.FlushAsync();
+                    response.Close();
             }
             catch (Exception ex)
             {

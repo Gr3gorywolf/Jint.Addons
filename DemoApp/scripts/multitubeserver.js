@@ -13,6 +13,7 @@ srv.get("/downloaded.gr3d2",function(req,res){
 	return res.file(filesFolder+"/downloaded.gr3d2");
 });
 let users = []
+srv.allowClientSideRouting(true);
 srv.staticFolder(filesFolder + '/frontend');
 srv.staticFolder(filesFolder + '/portraits');
 srv.staticFolder("E:/Backups/backup microsd 16GB/YTDownloads");

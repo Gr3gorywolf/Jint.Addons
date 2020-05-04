@@ -136,8 +136,9 @@ namespace JintAddons.Plugins.JintExpress
                         {
                             found = true;
                             var response = new Response(ctx);
-                            var request = new Request(ctx);
-                            routesDictionary[route].Invoke(request, response);
+                            var request = new Request(ctx); 
+                            routesDictionary[route].Invoke(request, response); 
+                           
                         }
                     }
                     if (!found)
