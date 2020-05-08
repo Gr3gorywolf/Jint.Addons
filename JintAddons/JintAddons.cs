@@ -26,7 +26,6 @@ namespace JintAddons
 
         public static void LoadHostedScript(Engine engine,string url)
         {
-
             CacheData data = new CacheData() {
             Data = "",
             Size = 0
@@ -63,22 +62,20 @@ namespace JintAddons
 
         }
 
-          public static void ListenVariableChanges(Engine eng,string variableName, Action<dynamic> callback)
+          public static void ListenVariableChanges(Engine eng,string variableName, Action<object> callback,int watchInterval = 350)
         {
            
                 var timer = new Timer();
-                string oldValue = null;
+                object catchedObj = null;
                 timer.Elapsed += delegate
                 {
-                    var engineVal =JsonConvert.SerializeObject(eng.GetValue(variableName).ToObject());
-                    if (oldValue != engineVal)
+                    var engObject = eng.GetValue(variableName).ToObject();
+                    if (Utils.ObjectUtils.HasDiffs(engObject, catchedObj))
                     {
-                        oldValue = engineVal;
-                        callback.Invoke(JsonConvert.DeserializeObject(engineVal));
-                    }
-                  
-                };
-                timer.Interval = 350;
+                        catchedObj = engObject;
+                        callback.Invoke(engObject);
+                    }                };
+                timer.Interval = watchInterval;
                 timer.Start();
         }
         public static bool debug = false;
