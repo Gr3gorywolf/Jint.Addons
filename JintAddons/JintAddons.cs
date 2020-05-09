@@ -24,7 +24,7 @@ namespace JintAddons
             CacheRetrieve = retrieve;
         }
 
-        public static void LoadHostedScript(Engine engine,string url)
+        public static void LoadHostedScript(Engine engine,string url,bool runAsJintScript = true)
         {
             CacheData data = new CacheData() {
             Data = "",
@@ -57,9 +57,24 @@ namespace JintAddons
 
             if (!string.IsNullOrEmpty(data.Data))
             {
-                engine.Execute(data.Data);
+                if (runAsJintScript)
+                {
+                    RunJintScript(engine, data.Data);
+                }
+                else
+                {
+                    engine.Execute(data.Data);
+                }
+               
+               
             }
 
+        }
+
+        public static void RunJintScript(Engine eng,string content)
+        {
+            var normalizedScript = Utils.ScriptHelper.NormalizeScript(content);
+             eng.Execute(normalizedScript);
         }
 
           public static void ListenVariableChanges(Engine eng,string variableName, Action<object> callback,int watchInterval = 350)

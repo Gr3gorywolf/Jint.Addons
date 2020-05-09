@@ -94,7 +94,7 @@ namespace DemoApp
             Console.WriteLine("Loading " + selectedScript + " press F5 to return to menu anytime");
             var engine = new Engine(cfg => { });
             JintAddons.JintAddons.Inject(engine, true);
-            engine.Execute(ReadScript(selectedScript));
+            JintAddons.JintAddons.RunJintScript(engine, ReadScript(selectedScript));
         }
 
         public static void RemoteLoader()
