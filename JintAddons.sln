@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoApp", "DemoApp\DemoApp.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JintAddons", "JintAddons\JintAddons.csproj", "{B328CBD7-C2E7-43B6-9140-2BEC79A4E4E8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoXamarin.Android", "DemoXamarin\DemoXamarin.Android\DemoXamarin.Android.csproj", "{A7BCBAEA-923E-40AB-A46E-0569C7689E33}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoXamarin", "DemoXamarin\DemoXamarin\DemoXamarin.csproj", "{63D6CA0D-C447-470F-AE09-178524D9B34B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,16 @@ Global
 		{B328CBD7-C2E7-43B6-9140-2BEC79A4E4E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B328CBD7-C2E7-43B6-9140-2BEC79A4E4E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B328CBD7-C2E7-43B6-9140-2BEC79A4E4E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7BCBAEA-923E-40AB-A46E-0569C7689E33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7BCBAEA-923E-40AB-A46E-0569C7689E33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7BCBAEA-923E-40AB-A46E-0569C7689E33}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{A7BCBAEA-923E-40AB-A46E-0569C7689E33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7BCBAEA-923E-40AB-A46E-0569C7689E33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7BCBAEA-923E-40AB-A46E-0569C7689E33}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{63D6CA0D-C447-470F-AE09-178524D9B34B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63D6CA0D-C447-470F-AE09-178524D9B34B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63D6CA0D-C447-470F-AE09-178524D9B34B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63D6CA0D-C447-470F-AE09-178524D9B34B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

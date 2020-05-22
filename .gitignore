@@ -6,6 +6,17 @@ JintAddons/lib/
 DemoApp/bin/
 DemoApp/obj/
 DemoApp/lib/
+# Binary storage
+DemoXamarin/DemoXamarin/bin/
+DemoXamarin/DemoXamarin/obj/
+DemoXamarin/DemoXamarin/lib/
+
+# Binary storage
+DemoXamarin/DemoXamarin.Android/bin/
+DemoXamarin/DemoXamarin.Android/obj/
+DemoXamarin/DemoXamarin.Android/lib/
+
+
 # Binary files
 *.db
 *.dll
