@@ -17,7 +17,7 @@ namespace JintAddons.Plugins.JintExpress
                     message = "Debug mode must be on"
                 };
             }
-            return ServerHelpers.GetTemplate("DD.mustache", JsonConvert.SerializeObject(json));
+            return ServerHelpers.GetAssemblyTemplate("DD.mustache", JsonConvert.SerializeObject(json));
         }
 
         public static string OopsTemplate(Exception ex)
@@ -27,13 +27,13 @@ namespace JintAddons.Plugins.JintExpress
             {
                 error = ex.Message + " --> " + ex.StackTrace;
             }
-            return ServerHelpers.GetTemplate("OopsTemplate.mustache", new { error });
+            return ServerHelpers.GetAssemblyTemplate("OopsTemplate.mustache", new { error });
         }
 
         public static string NoFoundTemplate(string route)
         {
 
-            return ServerHelpers.GetTemplate("404.mustache", new { route });
+            return ServerHelpers.GetAssemblyTemplate("404.mustache", new { route });
         }
 
 

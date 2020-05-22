@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using NLog.Fluent;
-using Nustache.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -71,7 +70,7 @@ namespace JintAddons.Plugins.JintExpress
         {
             try
             {
-                var html = Render.FileToString(viewPath, data);
+                var html = ServerHelpers.GetFileTemplate(viewPath,data);
                 send(html, 200, "text/html");
             }
             catch (Exception ex)

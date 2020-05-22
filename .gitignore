@@ -15,8 +15,6 @@ DemoXamarin/DemoXamarin/lib/
 DemoXamarin/DemoXamarin.Android/bin/
 DemoXamarin/DemoXamarin.Android/obj/
 DemoXamarin/DemoXamarin.Android/lib/
-
-
 # Binary files
 *.db
 *.dll

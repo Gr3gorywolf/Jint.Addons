@@ -18,15 +18,15 @@ srv.get('/api/v1/index', function (req, res) {
 });
 srv.post('/api/v1/form', function (req, res) {
    users.push(req.data);
-   res.render(basePath + 'templates/form.mustache', { klk: "awawawawaw" });
+   res.render(basePath + 'templates/form.mustache', { title: "Example title" });
 });
 
 srv.get('/mustache/form', function (req, res) {
-   res.render(basePath + 'templates/form.mustache', { klk: "awawawawaw" });
+   res.render(basePath + 'templates/form.mustache', { title: "Example title" });
 });
 
 srv.get('/mustache/index', function (req, res) {
-   res.render(basePath + 'templates/hello.mustache', { klk: "awawawawaw" });
+   res.render(basePath + 'templates/hello.mustache', { title: "Example title" });
 });
 
 srv.get('/mustache/500', function (req, res) {

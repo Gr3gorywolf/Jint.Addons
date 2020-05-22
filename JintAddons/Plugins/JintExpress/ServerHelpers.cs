@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using System.Linq;
-using Nustache.Core;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Net;
+using Mustache;
 
 namespace JintAddons.Plugins.JintExpress
 {
@@ -101,7 +101,7 @@ namespace JintAddons.Plugins.JintExpress
             return route;
         }
 
-        public static string GetTemplate(string templateFullName,object data)
+        public static string GetAssemblyTemplate(string templateFullName,object data)
         {
             var assembly = Assembly.GetExecutingAssembly();
             string resourceName =assembly.GetManifestResourceNames()
@@ -115,11 +115,41 @@ namespace JintAddons.Plugins.JintExpress
             string template = "";
             try
             {
-                 template = Render.StringToString(result, data);
+                HtmlFormatCompiler compiler = new HtmlFormatCompiler();
+                string format = result;
+                Generator generator = compiler.Compile(format);
+                template = generator.Render(data);
             }
             catch (Exception)
             {
                 template = "<h5 style='color:red'>Template rendering failed</h5>";
+            }
+            return template;
+        }
+
+        public static string GetFileTemplate(string templatePath, object data)
+        {
+
+
+            string template = "";
+            try
+            {
+               
+                if (File.Exists(templatePath))
+                {
+                    template = File.ReadAllText(templatePath);
+                }
+                else
+                {
+                    throw new Exception();
+                }
+                HtmlFormatCompiler compiler = new HtmlFormatCompiler();
+                Generator generator = compiler.Compile(template);
+                template = generator.Render(data);
+            }
+            catch (Exception ex)
+            {
+                template = $"<h5 style='color:red'>Template rendering failed {(JintAddons.debug?ex.Message:"")}</h5>" ;
             }
             return template;
         }
