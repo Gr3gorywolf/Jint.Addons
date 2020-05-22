@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NLog.Fluent;
-using Nustache.Core;
 namespace JintAddons.Plugins.JintExpress
 {
     public class Server
